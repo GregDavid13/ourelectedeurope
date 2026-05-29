@@ -7,22 +7,14 @@ type CookieToSet = { name: string; value: string; options: CookieOptions }
 const PROTECTED_ROUTES = ['/dashboard', '/settings', '/onboarding']
 const AUTH_ROUTES      = ['/login', '/register']
 
-// One source of truth for headers. Applied to EVERY returned response
-// including redirects (the original framework set them only on the
-// pass-through, so /login and /dashboard redirects shipped bare).
-function applySecurityHeaders(res: NextResponse, nonce: string): NextResponse {
-  res.headers.set('X-Content-Type-Options',   'nosniff')
-  res.headers.set('X-Frame-Options',          'DENY')
-  res.headers.set('Referrer-Policy',          'strict-origin-when-cross-origin')
-  res.headers.set('Strict-Transport-Security','max-age=31536000; includeSubDomains; preload')
-  res.headers.set('Permissions-Policy',       'camera=(), microphone=(), geolocation=()')
-  res.headers.set('Content-Security-Policy', [
+// Build the CSP for this request. nonce + strict-dynamic instead of
+// 'unsafe-inline'; the https://js.stripe.com entry is a pre-CSP3
+// fallback only. style-src keeps 'unsafe-inline' (Next injects inline
+// <style>; style << script risk — accepted trade-off).
+function buildCsp(nonce: string): string {
+  return [
     "default-src 'self'",
-    // nonce + strict-dynamic instead of 'unsafe-inline'. The
-    // https://js.stripe.com entry is a pre-CSP3 fallback only.
     `script-src 'self' 'nonce-${nonce}' 'strict-dynamic' https://js.stripe.com`,
-    // Known residual: Next injects inline <style>; style-src
-    // 'unsafe-inline' is an accepted trade-off (style << script risk).
     "style-src 'self' 'unsafe-inline'",
     "img-src 'self' data: https:",
     "connect-src 'self' https://*.supabase.co wss://*.supabase.co https://api.stripe.com",
@@ -32,14 +24,35 @@ function applySecurityHeaders(res: NextResponse, nonce: string): NextResponse {
     "base-uri 'self'",
     "form-action 'self'",
     "frame-ancestors 'none'",
-  ].join('; '))
+  ].join('; ')
+}
+
+// One source of truth for headers. Applied to EVERY returned response
+// including redirects (the original framework set them only on the
+// pass-through, so /login and /dashboard redirects shipped bare).
+function applySecurityHeaders(res: NextResponse, csp: string): NextResponse {
+  res.headers.set('X-Content-Type-Options',   'nosniff')
+  res.headers.set('X-Frame-Options',          'DENY')
+  res.headers.set('Referrer-Policy',          'strict-origin-when-cross-origin')
+  res.headers.set('Strict-Transport-Security','max-age=31536000; includeSubDomains; preload')
+  res.headers.set('Permissions-Policy',       'camera=(), microphone=(), geolocation=()')
+  res.headers.set('Content-Security-Policy', csp)
   return res
 }
 
 export async function middleware(request: NextRequest) {
   const nonce = Buffer.from(crypto.randomUUID()).toString('base64')
+  const csp = buildCsp(nonce)
+
   const requestHeaders = new Headers(request.headers)
   requestHeaders.set('x-nonce', nonce)
+  // CRITICAL: Next.js reads the nonce from the Content-Security-Policy
+  // *request* header and stamps it onto every <script> it injects.
+  // Without this header on the request, Next's bootstrap/hydration
+  // scripts ship with no nonce, strict-dynamic blocks them, and the app
+  // never hydrates (forms/buttons silently dead). Setting it on the
+  // response alone (as the original scaffold did) is not enough.
+  requestHeaders.set('Content-Security-Policy', csp)
 
   const response = NextResponse.next({ request: { headers: requestHeaders } })
 
@@ -64,14 +77,14 @@ export async function middleware(request: NextRequest) {
   // here. Documented, not yet fixed.
   if (PROTECTED_ROUTES.some(r => path.startsWith(r)) && !user) {
     return applySecurityHeaders(
-      NextResponse.redirect(new URL('/login', request.url)), nonce)
+      NextResponse.redirect(new URL('/login', request.url)), csp)
   }
   if (AUTH_ROUTES.some(r => path.startsWith(r)) && user) {
     return applySecurityHeaders(
-      NextResponse.redirect(new URL('/dashboard', request.url)), nonce)
+      NextResponse.redirect(new URL('/dashboard', request.url)), csp)
   }
 
-  return applySecurityHeaders(response, nonce)
+  return applySecurityHeaders(response, csp)
 }
 
 export const config = {
