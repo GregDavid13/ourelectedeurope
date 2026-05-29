@@ -29,7 +29,7 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "stripe": "^16.0.0",
+    "stripe": "^22.2.0",
     "@gregdavid13/permissions": "workspace:*"
   },
   "devDependencies": {
