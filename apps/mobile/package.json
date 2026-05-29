@@ -13,5 +13,5 @@
     "react": "18.3.1",
     "react-native": "0.76.9"
   },
-  "devDependencies": { "@ourelectedeurope/config": "workspace:*", "typescript": "^5.5.0" }
+  "devDependencies": { "@ourelectedeurope/config": "workspace:*", "typescript": "^6.0.3" }
 }

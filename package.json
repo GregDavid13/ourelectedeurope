@@ -14,7 +14,7 @@
     "clean": "turbo run clean && rm -rf node_modules"
   },
   "devDependencies": {
-    "turbo": "^2.0.0",
+    "turbo": "^2.9.16",
     "@changesets/cli": "^2.27.0"
   },
   "pnpm": {
