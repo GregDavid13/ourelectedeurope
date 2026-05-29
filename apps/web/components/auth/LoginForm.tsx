@@ -1,10 +1,9 @@
 // LoginForm — email/password sign-in via the browser Supabase client.
-// Session is persisted in cookies (createBrowserClient), so a
-// router.refresh() lets the middleware + server components pick up the
-// authed state before navigating to the app.
+// Session is persisted in cookies (createBrowserClient). On success we
+// do a hard navigation so the middleware + server components see the
+// new session cookie immediately.
 'use client'
 import { useState } from 'react'
-import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { loginSchema } from '@gregdavid13/validators'
 import { createClient } from '@/lib/supabase-browser'
@@ -15,7 +14,6 @@ const field =
   'placeholder:text-eu-blue-300 focus:border-eu-blue-600 focus:outline-none focus:ring-2 focus:ring-eu-blue-200'
 
 export function LoginForm() {
-  const router = useRouter()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState<string | null>(null)
@@ -31,17 +29,27 @@ export function LoginForm() {
       return
     }
 
+    // Guard the common misconfig: NEXT_PUBLIC_* are inlined at build
+    // time, so a build that ran before the vars were set ships an empty
+    // URL and sign-in fails opaquely. Surface it clearly instead.
+    if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
+      setError('Auth is not configured (missing Supabase env in this build — redeploy after setting NEXT_PUBLIC_SUPABASE_URL/ANON_KEY).')
+      return
+    }
+
     setLoading(true)
     const supabase = createClient()
     const { error } = await supabase.auth.signInWithPassword(parsed.data)
-    setLoading(false)
 
     if (error) {
+      setLoading(false)
       setError(error.message)
       return
     }
-    router.refresh()
-    router.push('/dashboard')
+    // Hard navigation: forces a fresh server request that carries the
+    // just-set session cookie, so the middleware sees the user and lets
+    // /dashboard through (avoids client-router cache/timing bounces).
+    window.location.assign('/dashboard')
   }
 
   return (
