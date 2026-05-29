@@ -34,7 +34,7 @@
   },
   "devDependencies": {
     "@ourelectedeurope/config": "workspace:*",
-    "typescript": "^5.5.0",
-    "@types/node": "^22.7.0"
+    "typescript": "^6.0.3",
+    "@types/node": "^25.9.1"
   }
 }
