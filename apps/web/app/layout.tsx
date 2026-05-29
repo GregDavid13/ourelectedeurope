@@ -1,8 +1,6 @@
-// Root layout. The CSP nonce is set by middleware on the request;
-// Next.js automatically applies it to its own injected <script> tags
-// when a nonce-based CSP is present — the layout does not need to
-// thread it manually. Pass `headers().get('x-nonce')` to a
-// `next/script` only if you add custom inline scripts.
+// Root layout. CSP is set by middleware.ts (script-src 'self'
+// 'unsafe-inline' — static-render-compatible; see the note there on why
+// the nonce/strict-dynamic scheme was dropped).
 import './globals.css'
 
 export const metadata = {
