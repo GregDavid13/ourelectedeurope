@@ -1,0 +1,40 @@
+{
+  "name": "@gregdavid13/stripe",
+  "version": "0.1.0",
+  "license": "UNLICENSED",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/GregDavid13/my-app",
+    "directory": "packages/stripe"
+  },
+  "sideEffects": false,
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "files": ["dist"],
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com",
+    "access": "restricted",
+    "main": "./dist/index.js",
+    "types": "./dist/index.d.ts",
+    "exports": {
+      ".": {
+        "types": "./dist/index.d.ts",
+        "require": "./dist/index.js",
+        "default": "./dist/index.js"
+      }
+    }
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "stripe": "^16.0.0",
+    "@gregdavid13/permissions": "workspace:*"
+  },
+  "devDependencies": {
+    "@ourelectedeurope/config": "workspace:*",
+    "typescript": "^5.5.0",
+    "@types/node": "^22.7.0"
+  }
+}

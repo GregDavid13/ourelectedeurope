@@ -1,0 +1,13 @@
+# Security-critical paths require a named reviewer.
+apps/web/middleware.ts              @gregdavid13
+apps/web/lib/supabase-admin.ts      @gregdavid13
+apps/web/lib/require-admin.ts       @gregdavid13
+apps/web/lib/encrypt.ts             @gregdavid13
+apps/web/lib/permissions.ts         @gregdavid13
+apps/web/lib/rate-limit.ts          @gregdavid13
+apps/web/app/api/webhooks/          @gregdavid13
+apps/web/app/api/auth/              @gregdavid13
+packages/crypto/                    @gregdavid13
+packages/permissions/               @gregdavid13
+supabase/migrations/                @gregdavid13
+supabase/tests/                     @gregdavid13

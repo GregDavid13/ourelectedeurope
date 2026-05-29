@@ -1,0 +1,18 @@
+# Supabase local/project config. `project_id` is set per product.
+project_id = "ourelectedeurope"
+
+[db]
+port = 54322
+major_version = 15
+
+[auth]
+site_url = "http://localhost:3000"
+additional_redirect_urls = ["http://localhost:3000/auth/callback"]
+enable_confirmations = true
+
+[auth.mfa]
+# Optional initially; enforce for paid tiers (Master Framework Part 7).
+
+[storage]
+# Buckets created via SQL in Part 7 Step 6: avatars (public),
+# documents (private), exports (private).

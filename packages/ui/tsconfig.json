@@ -1,0 +1,4 @@
+{
+  "extends": "@ourelectedeurope/config/tsconfig/nextjs",
+  "include": ["src"]
+}

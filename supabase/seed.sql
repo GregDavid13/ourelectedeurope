@@ -1,0 +1,3 @@
+-- Local seed data (applied by `supabase db reset`). Keep empty for
+-- production parity; add fixtures only for local dev. Do NOT seed
+-- admin_roles here for anything but local.

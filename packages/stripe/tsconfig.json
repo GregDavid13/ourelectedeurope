@@ -1,0 +1,7 @@
+{
+  "extends": "@ourelectedeurope/config/tsconfig/base",
+  "compilerOptions": {
+    "types": ["node"]
+  },
+  "include": ["src"]
+}

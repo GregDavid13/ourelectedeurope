@@ -1,0 +1,4 @@
+{
+  "extends": "@ourelectedeurope/config/tsconfig/base",
+  "include": ["src"]
+}

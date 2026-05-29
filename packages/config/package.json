@@ -1,0 +1,12 @@
+{
+  "name": "@ourelectedeurope/config",
+  "version": "0.1.0",
+  "private": true,
+  "files": ["tsconfig", "eslint"],
+  "exports": {
+    "./eslint": "./eslint/index.js",
+    "./tsconfig/base": "./tsconfig/base.json",
+    "./tsconfig/nextjs": "./tsconfig/nextjs.json",
+    "./tsconfig/react-native": "./tsconfig/react-native.json"
+  }
+}

@@ -1,0 +1,11 @@
+{
+  "expo": {
+    "name": "ourelectedeurope",
+    "slug": "ourelectedeurope",
+    "scheme": "ourelectedeurope",
+    "version": "0.1.0",
+    "ios": { "bundleIdentifier": "com.ourelectedeurope.app" },
+    "android": { "package": "com.ourelectedeurope.app" },
+    "plugins": ["expo-router", "expo-secure-store"]
+  }
+}

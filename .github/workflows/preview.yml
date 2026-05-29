@@ -1,0 +1,19 @@
+name: Preview Deploy
+on:
+  push:
+    branches: [main]
+
+jobs:
+  preview:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v3
+        with: { version: 9 }
+      - uses: actions/setup-node@v4
+        with: { node-version: 20, cache: pnpm }
+      - run: pnpm install --frozen-lockfile
+      # Vercel's GitHub integration handles the actual deploy; this job
+      # is the gate. Replace with `vercel deploy` + VERCEL_TOKEN if you
+      # drive deploys from CI instead of the Vercel Git integration.
+      - run: pnpm turbo run build
