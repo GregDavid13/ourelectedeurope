@@ -6,8 +6,9 @@
 import './globals.css'
 
 export const metadata = {
-  title: 'ourelectedeurope',
-  description: 'Scaffold from the SaaS Master Framework',
+  title: 'OurElected Europe — See how your representatives vote',
+  description:
+    'Track European legislation and follow exactly how your elected representatives vote on the bills that matter to you.',
 }
 
 export default function RootLayout({

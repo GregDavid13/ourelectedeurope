@@ -1,23 +1,23 @@
-// RegisterForm — email/password sign-up via the browser Supabase
-// client. registerSchema enforces a 12-char minimum password
-// (shared with the server-side validator). On success Supabase sends a
-// confirmation email; we surface a "check your inbox" state rather than
-// navigating, since the session isn't active until the link is clicked
-// (depends on the project's email-confirmation setting).
+// ForgotPasswordForm — triggers a Supabase password-reset email. The
+// link returns the user to /reset-password (still a scaffold stub —
+// implement it to complete the flow). We always show the same success
+// state regardless of whether the email exists, to avoid leaking which
+// addresses are registered.
 'use client'
 import { useState } from 'react'
 import Link from 'next/link'
-import { registerSchema } from '@gregdavid13/validators'
+import { z } from 'zod'
 import { createClient } from '@/lib/supabase-browser'
 import { Button } from '@/components/ui/Button'
+
+const emailSchema = z.string().email()
 
 const field =
   'mt-1 block w-full rounded-lg border border-eu-blue-200 px-3 py-2 text-eu-blue-950 ' +
   'placeholder:text-eu-blue-300 focus:border-eu-blue-600 focus:outline-none focus:ring-2 focus:ring-eu-blue-200'
 
-export function RegisterForm() {
+export function ForgotPasswordForm() {
   const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
   const [done, setDone] = useState(false)
@@ -26,24 +26,19 @@ export function RegisterForm() {
     e.preventDefault()
     setError(null)
 
-    const parsed = registerSchema.safeParse({ email, password })
-    if (!parsed.success) {
-      setError(parsed.error.issues[0]?.message ?? 'Please check your details.')
+    if (!emailSchema.safeParse(email).success) {
+      setError('Please enter a valid email address.')
       return
     }
 
     setLoading(true)
     const supabase = createClient()
-    const { error } = await supabase.auth.signUp({
-      ...parsed.data,
-      options: { emailRedirectTo: `${window.location.origin}/api/auth/callback` },
+    // We intentionally ignore the result's error detail for the UI: same
+    // confirmation either way (no account enumeration).
+    await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: `${window.location.origin}/reset-password`,
     })
     setLoading(false)
-
-    if (error) {
-      setError(error.message)
-      return
-    }
     setDone(true)
   }
 
@@ -55,8 +50,8 @@ export function RegisterForm() {
         </div>
         <h1 className="mt-4 text-2xl font-bold text-eu-blue-900">Check your inbox</h1>
         <p className="mt-2 text-sm text-eu-blue-700/70">
-          We sent a confirmation link to <span className="font-medium">{email}</span>.
-          Click it to activate your account.
+          If an account exists for <span className="font-medium">{email}</span>,
+          we&apos;ve sent a link to reset your password.
         </p>
         <Link href="/login" className="mt-6 inline-block text-sm font-semibold text-eu-blue-700 hover:underline">
           Back to log in
@@ -67,9 +62,9 @@ export function RegisterForm() {
 
   return (
     <div>
-      <h1 className="text-center text-2xl font-bold text-eu-blue-900">Create your account</h1>
+      <h1 className="text-center text-2xl font-bold text-eu-blue-900">Reset your password</h1>
       <p className="mt-2 text-center text-sm text-eu-blue-700/70">
-        Free forever. Follow the votes that matter to you.
+        Enter your email and we&apos;ll send you a reset link.
       </p>
 
       <form onSubmit={onSubmit} className="mt-6 space-y-4">
@@ -92,29 +87,13 @@ export function RegisterForm() {
           />
         </label>
 
-        <label className="block text-sm font-medium text-eu-blue-900">
-          Password
-          <input
-            type="password"
-            autoComplete="new-password"
-            required
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            className={field}
-            placeholder="At least 12 characters"
-          />
-          <span className="mt-1 block text-xs font-normal text-eu-blue-700/60">
-            Use at least 12 characters.
-          </span>
-        </label>
-
         <Button type="submit" variant="primary" size="lg" className="w-full" disabled={loading}>
-          {loading ? 'Creating account…' : 'Create account'}
+          {loading ? 'Sending…' : 'Send reset link'}
         </Button>
       </form>
 
       <p className="mt-6 text-center text-sm text-eu-blue-700/70">
-        Already have an account?{' '}
+        Remembered it?{' '}
         <Link href="/login" className="font-semibold text-eu-blue-700 hover:underline">
           Log in
         </Link>

@@ -1,5 +1,10 @@
-// Login — scaffold stub (Master Framework Part 2).
-// TODO: implement. Server Component by default.
+// Login page. Server Component — renders the client LoginForm inside
+// the (auth) card layout.
+import type { Metadata } from 'next'
+import { LoginForm } from '@/components/auth/LoginForm'
+
+export const metadata: Metadata = { title: 'Log in · OurElected Europe' }
+
 export default function Page() {
-  return <main>TODO: Login</main>
+  return <LoginForm />
 }
