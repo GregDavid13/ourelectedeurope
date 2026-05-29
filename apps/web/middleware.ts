@@ -4,7 +4,7 @@ import { createServerClient, type CookieOptions } from '@supabase/ssr'
 
 type CookieToSet = { name: string; value: string; options: CookieOptions }
 
-const PROTECTED_ROUTES = ['/dashboard', '/settings', '/onboarding']
+const PROTECTED_ROUTES = ['/dashboard', '/legislation', '/account', '/settings', '/onboarding']
 const AUTH_ROUTES      = ['/login', '/register']
 
 // CSP. NOTE on script-src: the scaffold originally used a per-request
